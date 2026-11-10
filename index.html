@@ -238,7 +238,18 @@
 (function () {
   var CHUNK = 8 * 1024 * 1024;      // must be a multiple of 256 KB
   var FIRST_CHUNK = 1024 * 1024;    // also a multiple of 256 KB
+  var DIRECT_CHUNK = 32 * 1024 * 1024;   // straight-to-Drive piece size, multiple of 256 KB
   var MAX_TRIES = 6;
+
+  // Outside Apps Script (e.g. on GitHub Pages) the phone can send video data
+  // straight to Google Drive, which is much faster than going via the script.
+  var useDirect = !(window.google && google.script && google.script.run);
+  var directWorked = false;
+  var directFails = 0;
+  (function () {                   // testing aid: #chunk256k=N sets the piece size
+    var m = /chunk256k=(\d+)/.exec(location.hash);
+    if (m) DIRECT_CHUNK = Math.max(1, parseInt(m[1], 10)) * 262144;
+  })();
 
   var queue = [];
   var running = false;
@@ -495,22 +506,31 @@
     function next() {
       if (job.offset >= job.file.size) return Promise.resolve();
       var from = job.offset;
-      // A small first piece gets the percentage moving quickly.
-      var to = Math.min(from + (from === 0 ? FIRST_CHUNK : CHUNK), job.file.size);
       var t0 = Date.now();
-      startTick(from, to - from);
-      return toBase64(job.file.slice(from, to))
-        .then(function (data) {
+      var to, sent;
+      if (useDirect) {
+        // Fast path: the phone sends the piece straight to Google Drive.
+        to = Math.min(from + DIRECT_CHUNK, job.file.size);
+        sent = putDirect(job, from, to).then(function (r) { directWorked = true; return r; });
+      } else {
+        // Fallback: the piece goes through the script. A small first piece
+        // gets the percentage moving quickly.
+        to = Math.min(from + (from === 0 ? FIRST_CHUNK : CHUNK), job.file.size);
+        startTick(from, to - from);
+        sent = toBase64(job.file.slice(from, to)).then(function (data) {
           return server('uploadChunk', { url: job.url, data: data, start: from, total: job.file.size });
-        })
-        .then(function (r) {
-          tries = 0;
-          rate = (to - from) / Math.max(.2, (Date.now() - t0) / 1000);
-          return handle(r);
-        }, recover);
+        });
+      }
+      return sent.then(function (r) {
+        tries = 0;
+        rate = (to - from) / Math.max(.2, (Date.now() - t0) / 1000);
+        return handle(r);
+      }, recover);
     }
     function recover(err) {
       stopTick();
+      // If the fast path has never worked on this phone, stop trying it.
+      if (useDirect && !directWorked && ++directFails >= 2) useDirect = false;
       if (!job.url) throw err;
       tries++;
       if (tries > MAX_TRIES) throw err;
@@ -521,6 +541,33 @@
       });
     }
     return next();
+  }
+
+  // One piece sent straight to the Drive upload session, with real progress.
+  function putDirect(job, from, to) {
+    return new Promise(function (resolve, reject) {
+      var xhr = new XMLHttpRequest();
+      var dog = null;
+      function feed() {            // give up on a piece that stalls for a minute
+        clearTimeout(dog);
+        dog = setTimeout(function () { xhr.abort(); }, 60000);
+      }
+      function fail() { clearTimeout(dog); reject(new Error('Network error')); }
+      xhr.open('PUT', job.url, true);
+      xhr.setRequestHeader('Content-Range', 'bytes ' + from + '-' + (to - 1) + '/' + job.file.size);
+      xhr.upload.onprogress = function (e) { feed(); setProgress(job, from + e.loaded); };
+      xhr.onload = function () {
+        clearTimeout(dog);
+        if (xhr.status === 200 || xhr.status === 201) resolve({ done: true });
+        else if (xhr.status === 308) resolve({ next: to });
+        else if (xhr.status === 404 || xhr.status === 410) resolve({ expired: true });
+        else reject(new Error('HTTP ' + xhr.status));
+      };
+      xhr.onerror = fail;
+      xhr.onabort = fail;
+      feed();
+      xhr.send(job.file.slice(from, to));
+    });
   }
 
   function withRetries(fn, n) {
