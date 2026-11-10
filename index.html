@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Happy 18th Larisa!</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --pink: #ff5fa9;
+    --pink-soft: #ff8cc3;
+    --cream: #fff5ec;
+    --cherry: #3b0a22;
+    --red: #ff2b2b;
+    --start: 2.1s;              /* when the page content starts animating in */
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; min-height: 100%; background: var(--pink); }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--cherry);
+    padding: 20px 16px 64px;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  main { position: relative; z-index: 1; max-width: 440px; margin: 0 auto; }
+  .mono {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: .7rem; letter-spacing: .14em; text-transform: uppercase;
+  }
+  .serif { font-family: "Instrument Serif", "Iowan Old Style", Georgia, serif; font-style: italic; font-weight: 400; }
+
+  /* ---------- Intro screen ---------- */
+  #intro {
+    position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: 100;
+    background: var(--cherry); color: var(--cream);
+    display: flex; align-items: center; justify-content: center;
+    animation: introOut .8s cubic-bezier(.76, 0, .24, 1) 1.8s forwards;
+  }
+  @keyframes introOut { to { transform: translateY(-101%); visibility: hidden; } }
+  .intro-box { position: relative; width: min(78vw, 330px); padding: 54px 20px 34px; text-align: center; }
+  .intro-num { font-size: min(46vw, 190px); line-height: .9; color: var(--pink); font-variant-numeric: tabular-nums; }
+  .intro-sub { margin-top: 18px; opacity: .8; }
+  .intro-bar { height: 2px; margin: 16px auto 0; width: 70%; background: rgba(255, 245, 236, .2); overflow: hidden; }
+  .intro-bar i { display: block; height: 100%; background: var(--pink); transform-origin: left; animation: fill 1.6s cubic-bezier(.5, 0, .2, 1) forwards; }
+  @keyframes fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+  /* ---------- Viewfinder corners (shared) ---------- */
+  .finder { position: relative; }
+  .finder::before, .finder::after, .finder > .c::before, .finder > .c::after {
+    content: ""; position: absolute; width: 24px; height: 24px; border: 0 solid var(--cream);
+  }
+  .finder::before { top: 0; left: 0; border-top-width: 2px; border-left-width: 2px; }
+  .finder::after { top: 0; right: 0; border-top-width: 2px; border-right-width: 2px; }
+  .finder > .c::before { bottom: 0; left: 0; border-bottom-width: 2px; border-left-width: 2px; }
+  .finder > .c::after { bottom: 0; right: 0; border-bottom-width: 2px; border-right-width: 2px; }
+  .rec {
+    position: absolute; top: 12px; left: 14px; display: flex; align-items: center; gap: 7px;
+    background: var(--cherry); color: var(--cream); padding: 5px 10px 5px 8px; border-radius: 99px;
+  }
+  #intro .rec { background: none; padding: 0; }
+  .rec i { width: 8px; height: 8px; border-radius: 50%; background: var(--red); animation: blink 1.2s steps(1) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+  .tc { position: absolute; top: 17px; right: 16px; font-variant-numeric: tabular-nums; }
+
+  /* ---------- Header ---------- */
+  header.finder { padding: 58px 20px 44px; margin-bottom: 46px; }
+  h1 {
+    font-size: clamp(3.2rem, 17vw, 4.6rem); line-height: .95; letter-spacing: -.01em;
+    margin: 0 0 16px; color: var(--cream); text-shadow: 3px 3px 0 var(--cherry); text-wrap: balance;
+  }
+  h1 .w {
+    display: inline-block; opacity: 0; transform: translateY(.5em) rotate(5deg);
+    animation: word .7s cubic-bezier(.2, .9, .2, 1.2) forwards;
+    animation-delay: calc(var(--start) + var(--i) * .1s);
+  }
+  @keyframes word { to { opacity: 1; transform: none; } }
+  .lead { margin: 0; font-size: 1.02rem; line-height: 1.4; font-weight: 500; max-width: 24ch; }
+
+  /* Spinning sticker */
+  .badge {
+    position: absolute; right: 2px; bottom: -44px; width: 100px; height: 100px;
+    border: 0; padding: 0; background: none; cursor: pointer; color: var(--cherry);
+    transition: transform .15s ease;
+  }
+  .badge:active { transform: scale(.9); }
+  .badge svg { display: block; width: 100%; height: 100%; animation: spin 16s linear infinite; }
+  .badge.fast svg { animation-duration: .7s; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .badge circle { fill: var(--cream); stroke: var(--cherry); stroke-width: 2; }
+  .badge text { fill: var(--cherry); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 9.5px; }
+  .badge b { position: absolute; top: 0; right: 0; bottom: 0; left: 0; display: flex; align-items: center; justify-content: center; font-size: 2.3rem; }
+
+  /* Scrolling tape */
+  .tape {
+    margin: 0 -24px 34px; padding: 9px 0; background: var(--cherry); color: var(--cream);
+    transform: rotate(-2deg); overflow: hidden; white-space: nowrap;
+  }
+  .tape div { display: inline-block; animation: slide 16s linear infinite; }
+  @keyframes slide { to { transform: translateX(-50%); } }
+
+  /* ---------- Form ---------- */
+  label.field { display: block; margin-bottom: 2px; }
+  input[type=text] {
+    width: 100%; padding: 10px 0 12px; font-size: 1.15rem; font-family: inherit;
+    color: var(--cherry); background: transparent; border: 0; border-bottom: 2px solid var(--cherry);
+    border-radius: 0; outline: none;
+  }
+  input[type=text]::placeholder { color: rgba(59, 10, 34, .45); }
+  .btn {
+    display: flex; align-items: center; justify-content: space-between;
+    width: 100%; cursor: pointer; padding: 18px 16px 18px 22px; margin-top: 28px;
+    font-size: 1.12rem; font-weight: 700; border-radius: 16px;
+    background: var(--cream); color: var(--cherry); border: 2px solid var(--cherry);
+    box-shadow: 6px 6px 0 var(--cherry);
+    transition: transform .08s ease, box-shadow .08s ease;
+  }
+  .btn:active { transform: translate(6px, 6px); box-shadow: 0 0 0 var(--cherry); }
+  .btn span {
+    width: 38px; height: 38px; border-radius: 50%; background: var(--cherry); color: var(--cream);
+    display: flex; align-items: center; justify-content: center; font-weight: 400;
+    animation: bob 1.6s ease-in-out infinite;
+  }
+  @keyframes bob { 50% { transform: translateY(-4px); } }
+  input[type=file] { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+
+  /* ---------- Upload list ---------- */
+  #status { min-height: 1.3em; margin: 34px 0 6px; font-weight: 600; }
+  #listCard { display: none; }
+  .item { padding: 12px 0 14px; border-top: 2px solid var(--cherry); }
+  .row { display: flex; justify-content: space-between; gap: 12px; font-size: .92rem; font-weight: 500; }
+  .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .state { flex: none; font-variant-numeric: tabular-nums; }
+  .bar { height: 10px; margin-top: 10px; border: 2px solid var(--cherry); border-radius: 99px; overflow: hidden; }
+  .bar > i { display: block; height: 100%; width: 0; background: var(--cherry); transition: width .4s; }
+  .item.busy .bar { background: repeating-linear-gradient(-45deg, transparent 0 6px, rgba(59, 10, 34, .22) 6px 12px); background-size: 34px 100%; animation: stripes .7s linear infinite; }
+  @keyframes stripes { to { background-position: 34px 0; } }
+  .item.done .bar > i { background: var(--cream); }
+  .item.fail .bar > i { background: var(--red); }
+  .retry { background: none; border: 0; padding: 0; cursor: pointer; font: inherit; font-weight: 700; color: var(--cherry); text-decoration: underline; text-underline-offset: 3px; }
+
+  /* ---------- How-to ---------- */
+  .how { margin-top: 44px; }
+  .how ol { list-style: none; margin: 10px 0 0; padding: 0; }
+  .how li { display: flex; gap: 14px; padding: 12px 0; border-top: 2px solid var(--cherry); font-weight: 500; line-height: 1.35; }
+  .how li:last-child { border-bottom: 2px solid var(--cherry); }
+  .how li em { font-size: 1.7rem; line-height: 1; color: var(--cream); text-shadow: 2px 2px 0 var(--cherry); min-width: 30px; }
+  .note { margin: 16px 0 0; font-size: .85rem; line-height: 1.5; opacity: .8; }
+
+  /* ---------- Motion ---------- */
+  .in { opacity: 0; transform: translateY(20px); animation: rise .7s cubic-bezier(.2, .8, .2, 1) forwards; animation-delay: calc(var(--start) + var(--d, 0s)); }
+  @keyframes rise { to { opacity: 1; transform: none; } }
+  .sky { position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+  .sky span { position: absolute; color: var(--pink-soft); animation: twinkle 3s ease-in-out infinite; }
+  @keyframes twinkle { 0%, 100% { transform: scale(.5) rotate(0deg); opacity: .3; } 50% { transform: scale(1.15) rotate(40deg); opacity: 1; } }
+  .p { position: fixed; left: 0; top: 0; z-index: 60; pointer-events: none; font-size: 20px; line-height: 1; animation: fly .95s cubic-bezier(.15, .7, .3, 1) forwards; }
+  @keyframes fly {
+    from { transform: translate(var(--x), var(--y)) scale(.3) rotate(0deg); opacity: 1; }
+    to { transform: translate(calc(var(--x) + var(--dx)), calc(var(--y) + var(--dy))) scale(1.25) rotate(var(--r)); opacity: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #intro { display: none; }
+    *, *::before, *::after { animation-duration: .01ms !important; animation-delay: 0s !important; animation-iteration-count: 1 !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div id="intro" aria-hidden="true">
+  <div class="intro-box finder">
+    <div class="c"></div>
+    <div class="rec mono"><i></i>Rec</div>
+    <div class="intro-num serif" id="introNum">00</div>
+    <div class="intro-sub mono">Loading the party cam</div>
+    <div class="intro-bar"><i></i></div>
+  </div>
+</div>
+
+<div class="sky" aria-hidden="true">
+  <span style="left:8%;top:9%;font-size:22px">✦</span>
+  <span style="left:86%;top:16%;font-size:16px;animation-delay:.8s">✦</span>
+  <span style="left:72%;top:38%;font-size:26px;animation-delay:1.6s">✦</span>
+  <span style="left:5%;top:47%;font-size:15px;animation-delay:.4s">✦</span>
+  <span style="left:90%;top:63%;font-size:20px;animation-delay:2.1s">✦</span>
+  <span style="left:14%;top:78%;font-size:24px;animation-delay:1.2s">✦</span>
+  <span style="left:62%;top:90%;font-size:16px;animation-delay:.2s">✦</span>
+</div>
+
+<main>
+  <header class="finder in">
+    <div class="c"></div>
+    <div class="rec mono"><i></i>Rec</div>
+    <div class="tc mono" id="tc">00:00:00:00</div>
+    <h1 class="serif" id="title">Happy 18th Larisa!</h1>
+    <p class="lead">Film the party from your point of view and drop your videos here.</p>
+    <button class="badge" id="badge" type="button" aria-label="Tap for sparkles">
+      <svg viewBox="0 0 120 120" aria-hidden="true">
+        <defs><path id="ring" d="M60,60 m-45,0 a45,45 0 1,1 90,0 a45,45 0 1,1 -90,0"/></defs>
+        <circle cx="60" cy="60" r="58"/>
+        <text><textPath href="#ring" textLength="276">PARTY CAM ✦ YOUR POV ✦ PARTY CAM ✦ YOUR POV ✦ </textPath></text>
+      </svg>
+      <b class="serif" id="badgeNum">18</b>
+    </button>
+  </header>
+
+  <div class="tape mono in" style="--d:.15s" aria-hidden="true">
+    <div>Film it ✦ Upload it ✦ Be in the movie ✦ Film it ✦ Upload it ✦ Be in the movie ✦ Film it ✦ Upload it ✦ Be in the movie ✦ Film it ✦ Upload it ✦ Be in the movie ✦ </div>
+  </div>
+
+  <div class="in" style="--d:.3s">
+    <label class="field mono" for="guest">Your name · optional</label>
+    <input type="text" id="guest" maxlength="40" autocomplete="given-name" placeholder="So we know who filmed it">
+  </div>
+
+  <div class="in" style="--d:.42s">
+    <label class="btn" for="pick">Upload my videos <span>↑</span></label>
+    <input type="file" id="pick" accept="video/*,image/*" multiple>
+  </div>
+
+  <div id="status"></div>
+  <div id="listCard"><div id="list"></div></div>
+
+  <section class="how in" style="--d:.56s">
+    <div class="mono">How to be in the movie</div>
+    <ol>
+      <li><em class="serif">1</em><span>Film with your phone's normal camera. It looks so much better.</span></li>
+      <li><em class="serif">2</em><span>Come back to this page and tap <b>Upload my videos</b>.</span></li>
+      <li><em class="serif">3</em><span>Keep the page open until every upload says Done.</span></li>
+    </ol>
+    <p class="note">Slow signal? Upload later tonight or tomorrow with the same link. You can add more any time.</p>
+  </section>
+</main>
+
+<script>
+(function () {
+  var CHUNK = 8 * 1024 * 1024;      // must be a multiple of 256 KB
+  var FIRST_CHUNK = 1024 * 1024;    // also a multiple of 256 KB
+  var MAX_TRIES = 6;
+
+  var queue = [];
+  var running = false;
+  var wakeLock = null;
+  var celebrated = false;
+
+  var listEl = document.getElementById('list');
+  var listCard = document.getElementById('listCard');
+  var statusEl = document.getElementById('status');
+  var guestEl = document.getElementById('guest');
+
+  /* ---------- Look and feel ---------- */
+  var calm = false;
+  try { calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+
+  // Intro: count up to the number on the sticker.
+  (function () {
+    var numEl = document.getElementById('introNum');
+    var target = parseInt(document.getElementById('badgeNum').textContent, 10);
+    if (!numEl || !target || calm) return;
+    var t0 = Date.now();
+    var timer = setInterval(function () {
+      var k = Math.min(1, (Date.now() - t0) / 1400);
+      var n = Math.round(target * (1 - Math.pow(1 - k, 3)));
+      numEl.textContent = (n < 10 ? '0' : '') + n;
+      if (k >= 1) clearInterval(timer);
+    }, 40);
+  })();
+
+  // Title: bring the words in one at a time.
+  (function () {
+    var h = document.getElementById('title');
+    var words = h.textContent.trim().split(' ');
+    h.textContent = '';
+    words.forEach(function (word, i) {
+      var s = document.createElement('span');
+      s.className = 'w'; s.textContent = word; s.style.setProperty('--i', i);
+      h.appendChild(s);
+      if (i < words.length - 1) h.appendChild(document.createTextNode(' '));
+    });
+  })();
+
+  // Running timecode in the viewfinder.
+  (function () {
+    var tc = document.getElementById('tc');
+    var t0 = Date.now();
+    function two(n) { return (n < 10 ? '0' : '') + n; }
+    setInterval(function () {
+      var ms = Date.now() - t0;
+      var s = Math.floor(ms / 1000);
+      tc.textContent = two(Math.floor(s / 3600)) + ':' + two(Math.floor(s / 60) % 60) + ':' + two(s % 60) + ':' + two(Math.floor((ms % 1000) / 40));
+    }, 80);
+  })();
+
+  // Hearts and sparkles.
+  var SHAPES = ['♥', '✦', '♥', '✧'];
+  var COLORS = ['#fff5ec', '#3b0a22', '#ffffff', '#ffd0e6'];
+  function burst(x, y, count, reach) {
+    if (calm) return;
+    for (var i = 0; i < count; i++) {
+      var p = document.createElement('span');
+      var angle = Math.random() * Math.PI * 2;
+      var dist = reach * (.45 + Math.random() * .55);
+      p.className = 'p';
+      p.textContent = SHAPES[i % SHAPES.length];
+      p.style.color = COLORS[Math.floor(Math.random() * COLORS.length)];
+      p.style.fontSize = (14 + Math.random() * 16) + 'px';
+      p.style.setProperty('--x', (x - 10) + 'px');
+      p.style.setProperty('--y', (y - 10) + 'px');
+      p.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
+      p.style.setProperty('--dy', (Math.sin(angle) * dist - reach * .25) + 'px');
+      p.style.setProperty('--r', (Math.random() * 240 - 120) + 'deg');
+      document.body.appendChild(p);
+      setTimeout(function (el) { if (el.parentNode) el.parentNode.removeChild(el); }, 1000, p);
+    }
+  }
+  function burstAt(el, count, reach) {
+    var r = el.getBoundingClientRect();
+    burst(r.left + r.width / 2, r.top + r.height / 2, count, reach);
+  }
+
+  // Tap anywhere for a little sparkle; tap the sticker for a big one.
+  document.addEventListener('pointerdown', function (e) {
+    if (e.target && e.target.closest && e.target.closest('#badge')) return;
+    burst(e.clientX, e.clientY, 5, 70);
+  });
+  var badge = document.getElementById('badge');
+  badge.addEventListener('click', function () {
+    burstAt(badge, 22, 190);
+    badge.className = 'badge fast';
+    setTimeout(function () { badge.className = 'badge'; }, 900);
+  });
+
+  /* ---------- Uploading ---------- */
+  try { guestEl.value = localStorage.getItem('guest') || ''; } catch (e) {}
+  guestEl.addEventListener('change', function () {
+    try { localStorage.setItem('guest', guestEl.value); } catch (e) {}
+  });
+
+  var pick = document.getElementById('pick');
+  pick.addEventListener('change', function () {
+    for (var i = 0; i < pick.files.length; i++) addFile(pick.files[i]);
+    pick.value = '';
+    celebrated = false;
+    pump();
+  });
+
+  window.addEventListener('beforeunload', function (e) {
+    if (running) { e.preventDefault(); e.returnValue = ''; }
+  });
+
+  function addFile(file) {
+    var el = document.createElement('div');
+    el.className = 'item';
+    var row = document.createElement('div'); row.className = 'row';
+    var name = document.createElement('span'); name.className = 'name'; name.textContent = file.name || 'video';
+    var state = document.createElement('span'); state.className = 'state mono'; state.textContent = 'Waiting';
+    row.appendChild(name); row.appendChild(state);
+    var bar = document.createElement('div'); bar.className = 'bar';
+    var fill = document.createElement('i'); bar.appendChild(fill);
+    el.appendChild(row); el.appendChild(bar);
+    listEl.appendChild(el);
+    listCard.style.display = 'block';
+    queue.push({ file: file, el: el, state: state, fill: fill, url: null, offset: 0, status: 'waiting' });
+  }
+
+  function setProgress(job, bytes) {
+    var pct = job.file.size ? Math.min(100, Math.floor(bytes / job.file.size * 100)) : 0;
+    job.fill.style.width = pct + '%';
+    job.state.textContent = pct + '%';
+  }
+
+  function refreshStatus() {
+    var left = queue.filter(function (j) { return j.status === 'waiting' || j.status === 'uploading'; }).length;
+    var failed = queue.filter(function (j) { return j.status === 'failed'; }).length;
+    var done = queue.filter(function (j) { return j.status === 'done'; }).length;
+    if (left) statusEl.textContent = 'Uploading. Keep this page open.';
+    else if (failed) statusEl.textContent = 'Some uploads stopped. Tap "Try again" when your signal is better.';
+    else if (done) {
+      statusEl.textContent = "You're in the movie. Thank you! ♥";
+      if (!celebrated) { celebrated = true; burst(window.innerWidth / 2, window.innerHeight * .45, 34, 260); }
+    }
+    else statusEl.textContent = '';
+  }
+
+  function pump() {
+    refreshStatus();
+    if (running) return;
+    var job = null;
+    for (var i = 0; i < queue.length; i++) if (queue[i].status === 'waiting') { job = queue[i]; break; }
+    if (!job) { releaseWake(); return; }
+    running = true;
+    job.status = 'uploading';
+    job.el.className = 'item busy';
+    requestWake();
+    refreshStatus();
+    runJob(job).then(function () {
+      job.status = 'done';
+      job.el.className = 'item done';
+      job.fill.style.width = '100%';
+      job.state.textContent = 'Done ♥';
+      burstAt(job.state, 10, 110);
+    }, function (err) {
+      job.status = 'failed';
+      job.el.className = 'item fail';
+      job.state.textContent = '';
+      var b = document.createElement('button');
+      b.className = 'retry'; b.textContent = 'Try again';
+      b.onclick = function () {
+        job.status = 'waiting'; job.el.className = 'item';
+        job.state.textContent = 'Waiting'; pump();
+      };
+      job.state.appendChild(b);
+      if (window.console) console.error(err);
+    }).then(function () { running = false; pump(); });
+  }
+
+  function runJob(job) {
+    var start = job.url ? Promise.resolve(job.url) : withRetries(function () { return openSession(job); }, 3);
+    return start.then(function (url) {
+      job.url = url;
+      return sendAll(job);
+    });
+  }
+
+  // Calls a function in Code.gs and returns a promise. Inside Apps Script it
+  // uses google.script.run; on a standalone host it posts to the web app URL.
+  var API_URL = "https://script.google.com/macros/s/AKfycbzRQUoTlZGw7efrOCSIQWdjrftSFULgcINppiA3gxldKuT7-HdE6UG6vF5DaFmnKjahxg/exec";
+  function server(fn, arg) {
+    if (window.google && google.script && google.script.run) {
+      return new Promise(function (resolve, reject) {
+        google.script.run.withSuccessHandler(resolve).withFailureHandler(reject)[fn](arg);
+      });
+    }
+    return fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ fn: fn, arg: arg })
+    }).then(function (res) {
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      return res.json();
+    }).then(function (out) {
+      if (out.error) throw new Error(out.error);
+      return out.result;
+    });
+  }
+
+  function openSession(job) {
+    return server('createUploadSession', {
+      name: job.file.name,
+      type: job.file.type,
+      size: job.file.size,
+      guest: guestEl.value
+    });
+  }
+
+  function toBase64(blob) {
+    return new Promise(function (resolve, reject) {
+      var r = new FileReader();
+      r.onload = function () { resolve(String(r.result).split(',')[1] || ''); };
+      r.onerror = function () { reject(r.error || new Error('Could not read file')); };
+      r.readAsDataURL(blob);
+    });
+  }
+
+  // Sends the file piece by piece through the script, which passes each
+  // piece on to Google Drive.
+  function sendAll(job) {
+    var tries = 0;
+    var rate = 350000;               // bytes per second; measured after the first piece
+    var ticker = null;
+    setProgress(job, job.offset);
+    // While a piece is on its way, move the percentage at the measured speed
+    // so a long video never sits on one number.
+    function startTick(from, size) {
+      stopTick();
+      var t0 = Date.now();
+      ticker = setInterval(function () {
+        setProgress(job, from + Math.min(size * .95, (Date.now() - t0) / 1000 * rate));
+      }, 300);
+    }
+    function stopTick() { if (ticker) { clearInterval(ticker); ticker = null; } }
+    function handle(r) {
+      stopTick();
+      if (r && r.done) { job.offset = job.file.size; return; }
+      if (r && r.expired) {            // session gone: start this file again next time
+        job.url = null; job.offset = 0;
+        throw new Error('Upload session expired');
+      }
+      job.offset = r.next;
+      setProgress(job, job.offset);
+      return next();
+    }
+    function next() {
+      if (job.offset >= job.file.size) return Promise.resolve();
+      var from = job.offset;
+      // A small first piece gets the percentage moving quickly.
+      var to = Math.min(from + (from === 0 ? FIRST_CHUNK : CHUNK), job.file.size);
+      var t0 = Date.now();
+      startTick(from, to - from);
+      return toBase64(job.file.slice(from, to))
+        .then(function (data) {
+          return server('uploadChunk', { url: job.url, data: data, start: from, total: job.file.size });
+        })
+        .then(function (r) {
+          tries = 0;
+          rate = (to - from) / Math.max(.2, (Date.now() - t0) / 1000);
+          return handle(r);
+        }, recover);
+    }
+    function recover(err) {
+      stopTick();
+      if (!job.url) throw err;
+      tries++;
+      if (tries > MAX_TRIES) throw err;
+      return wait(Math.min(15000, 1500 * Math.pow(2, tries - 1))).then(function () {
+        // Ask Drive how much it already has, then carry on from there.
+        return server('uploadStatus', { url: job.url, total: job.file.size })
+          .then(handle, function () { return recover(err); });
+      });
+    }
+    return next();
+  }
+
+  function withRetries(fn, n) {
+    return fn().catch(function (err) {
+      if (n <= 1) throw err;
+      return wait(2000).then(function () { return withRetries(fn, n - 1); });
+    });
+  }
+
+  function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+
+  function requestWake() {
+    try {
+      if (navigator.wakeLock && !wakeLock) {
+        navigator.wakeLock.request('screen').then(function (l) { wakeLock = l; }, function () {});
+      }
+    } catch (e) {}
+  }
+  function releaseWake() {
+    try { if (wakeLock) { wakeLock.release(); wakeLock = null; } } catch (e) {}
+  }
+})();
+</script>
+</body>
+</html>
