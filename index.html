@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
-<title>Happy 18th Larisa!</title>
+<title>Larisa's 18th Birthday</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
@@ -194,7 +194,7 @@
     <div class="c"></div>
     <div class="rec mono"><i></i>Rec</div>
     <div class="tc mono" id="tc">00:00:00:00</div>
-    <h1 class="serif" id="title">Happy 18th Larisa!</h1>
+    <h1 class="serif" id="title">Larisa's 18th Birthday</h1>
     <p class="lead">Film the party from your point of view and drop your videos here.</p>
     <button class="badge" id="badge" type="button" aria-label="Tap for sparkles">
       <svg viewBox="0 0 120 120" aria-hidden="true">
@@ -462,7 +462,8 @@
       name: job.file.name,
       type: job.file.type,
       size: job.file.size,
-      guest: guestEl.value
+      guest: guestEl.value,
+      origin: window.location.origin
     });
   }
 
@@ -529,15 +530,22 @@
     }
     function recover(err) {
       stopTick();
-      // If the fast path has never worked on this phone, stop trying it.
-      if (useDirect && !directWorked && ++directFails >= 2) useDirect = false;
       if (!job.url) throw err;
       tries++;
       if (tries > MAX_TRIES) throw err;
-      return wait(Math.min(15000, 1500 * Math.pow(2, tries - 1))).then(function () {
+      var wasDirect = useDirect;
+      var from = job.offset;
+      return wait(tries === 1 ? 400 : Math.min(15000, 1500 * Math.pow(2, tries - 1))).then(function () {
         // Ask Drive how much it already has, then carry on from there.
-        return server('uploadStatus', { url: job.url, total: job.file.size })
-          .then(handle, function () { return recover(err); });
+        return server('uploadStatus', { url: job.url, total: job.file.size }).then(function (r) {
+          if (wasDirect) {
+            // The data arrived even though the reply was lost: the fast path works.
+            if (r && (r.done || r.next > from)) directWorked = true;
+            // It has never worked on this phone: stop trying it.
+            else if (!directWorked && ++directFails >= 2) useDirect = false;
+          }
+          return handle(r);
+        }, function () { return recover(err); });
       });
     }
     return next();
